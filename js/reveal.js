@@ -738,6 +738,41 @@
 		// Slide number
 		dom.slideNumber = createSingletonNode( dom.wrapper, 'div', 'slide-number', '' );
 
+		// Chapter name
+		dom.chapterList = [];
+		dom.chapterArrowList = [];
+		var index_menu = 0;
+		toArray( dom.wrapper.querySelectorAll( HORIZONTAL_SLIDES_SELECTOR ) ).forEach( function( hslide, h ) {
+			if( hslide.hasAttribute( 'slide-title' ) ) {
+				dom.chapterList[index_menu] = createNode( dom.wrapper, 'div', 'chapterName', hslide.getAttribute("slide-title") );
+				dom.chapterArrowList[index_menu] = createNode( dom.wrapper, 'img', 'chapterArrow' );
+				if( hslide.hasAttribute( 'slide-title-position' ) ) {
+					if( hslide.getAttribute("slide-title-position") === "right" ) {
+						dom.chapterArrowList[index_menu].setAttribute('src', 'img/arrow-right.svg' );
+						dom.chapterArrowList[index_menu].style.marginLeft = getProgressTitle(h) * dom.wrapper.offsetWidth - 8 + 'px';
+						dom.chapterList[index_menu].style.marginLeft = getProgressTitle(h) * dom.wrapper.offsetWidth - dom.chapterList[index_menu].offsetWidth + 'px';
+					}
+					else if( hslide.getAttribute("slide-title-position") === "middle" ) {
+						dom.chapterArrowList[index_menu].setAttribute('src', 'img/arrow-middle.svg' );
+						dom.chapterArrowList[index_menu].style.marginLeft = getProgressTitle(h) * dom.wrapper.offsetWidth - 8 + 'px';
+						dom.chapterList[index_menu].style.marginLeft = getProgressTitle(h) * dom.wrapper.offsetWidth - dom.chapterList[index_menu].offsetWidth/2 + 'px';
+					}
+					else {
+						dom.chapterArrowList[index_menu].setAttribute('src', 'img/arrow-left.svg' );
+						dom.chapterArrowList[index_menu].style.marginLeft = getProgressTitle(h) * dom.wrapper.offsetWidth + 'px';
+						dom.chapterList[index_menu].style.marginLeft = getProgressTitle(h) * dom.wrapper.offsetWidth + 'px';
+					}
+
+				}
+				else {
+					dom.chapterArrowList[index_menu].setAttribute('src', 'img/arrow-left.svg' );
+					dom.chapterArrowList[index_menu].style.marginLeft = getProgressTitle(h) * dom.wrapper.offsetWidth + 'px';
+					dom.chapterList[index_menu].style.marginLeft = getProgressTitle(h) * dom.wrapper.offsetWidth + 'px';
+				}
+				index_menu += 1;
+			}
+		} );
+
 		// Element containing notes that are visible to the audience
 		dom.speakerNotes = createSingletonNode( dom.wrapper, 'div', 'speaker-notes', null );
 		dom.speakerNotes.setAttribute( 'data-prevent-swipe', '' );
@@ -1017,6 +1052,22 @@
 				dom.wrapper.scrollLeft = 0;
 			}
 		}, 1000 );
+
+	}
+
+	/**
+	 * Creates an HTML element and returns a reference to it.
+	 */
+	function createNode( container, tagname, classname, innerHTML ) {
+
+		var node = document.createElement( tagname );
+		node.classList.add( classname );
+		if( typeof innerHTML === 'string' ) {
+			node.innerHTML = innerHTML;
+		}
+		container.appendChild( node );
+
+		return node;
 
 	}
 
@@ -3412,6 +3463,27 @@
 
 		}
 
+		var i_chapterlist;
+		var chapterName;
+		var chapterArrow;
+
+		if( getProgress() === 0 || getProgress() === 1 ) {
+			for( i_chapterlist = 0; i_chapterlist < dom.chapterList.length; i_chapterlist++ ) {
+				chapterName = dom.chapterList[i_chapterlist];
+				chapterArrow = dom.chapterArrowList[i_chapterlist];
+				chapterName.style.display = "none";
+				chapterArrow.style.display = "none";
+			}
+		}
+		else {
+			for( i_chapterlist = 0; i_chapterlist < dom.chapterList.length; i_chapterlist++ ) {
+				chapterName = dom.chapterList[i_chapterlist];
+				chapterArrow = dom.chapterArrowList[i_chapterlist];
+				chapterName.style.display = "initial";
+				chapterArrow.style.display = "initial";
+			}
+		}
+
 	}
 
 
@@ -3445,6 +3517,11 @@
 				switch( format ) {
 					case 'c':
 						value.push( getSlidePastCount() + 1 );
+						break;
+					case 'h.v/t':
+						if( isVerticalSlide() && indexv > 0 ) value.push( (indexh + 1) + '.' + indexv );
+						else value.push( indexh + 1);
+						value.push( '/', getTotalSlidesLevelOne() );
 						break;
 					case 'c/t':
 						value.push( getSlidePastCount() + 1, '/', getTotalSlides() );
@@ -4247,7 +4324,7 @@
 					break mainLoop;
 				}
 
-				pastCount++;
+				// pastCount++;
 
 			}
 
@@ -4257,9 +4334,9 @@
 			}
 
 			// Don't count the wrapping section for vertical slides
-			if( horizontalSlide.classList.contains( 'stack' ) === false ) {
+			// if( horizontalSlide.classList.contains( 'stack' ) === false ) {
 				pastCount++;
-			}
+			// }
 
 		}
 
@@ -4276,27 +4353,37 @@
 	function getProgress() {
 
 		// The number of past and total slides
-		var totalCount = getTotalSlides();
+		var totalCount = getTotalSlidesLevelOne();
 		var pastCount = getSlidePastCount();
 
-		if( currentSlide ) {
+		// if( currentSlide ) {
+		//
+		// 	var allFragments = currentSlide.querySelectorAll( '.fragment' );
+		//
+		// 	// If there are fragments in the current slide those should be
+		// 	// accounted for in the progress.
+		// 	if( allFragments.length > 0 ) {
+		// 		var visibleFragments = currentSlide.querySelectorAll( '.fragment.visible' );
+		//
+		// 		// This value represents how big a portion of the slide progress
+		// 		// that is made up by its fragments (0-1)
+		// 		var fragmentWeight = 0.9;
+		//
+		// 		// Add fragment progress to the past slide count
+		// 		pastCount += ( visibleFragments.length / allFragments.length ) * fragmentWeight;
+		// 	}
+		//
+		// }
 
-			var allFragments = currentSlide.querySelectorAll( '.fragment' );
+		return pastCount / ( totalCount - 1 );
 
-			// If there are fragments in the current slide those should be
-			// accounted for in the progress.
-			if( allFragments.length > 0 ) {
-				var visibleFragments = currentSlide.querySelectorAll( '.fragment.visible' );
+	}
 
-				// This value represents how big a portion of the slide progress
-				// that is made up by its fragments (0-1)
-				var fragmentWeight = 0.9;
+	function getProgressTitle( slideNumber ) {
 
-				// Add fragment progress to the past slide count
-				pastCount += ( visibleFragments.length / allFragments.length ) * fragmentWeight;
-			}
-
-		}
+		// The number of past and total slides
+		var totalCount = getTotalSlidesLevelOne();
+		var pastCount = slideNumber;
 
 		return Math.min( pastCount / ( totalCount - 1 ), 1 );
 
@@ -4537,6 +4624,15 @@
 	function getTotalSlides() {
 
 		return getSlides().length;
+
+	}
+
+	/**
+	 * Retrieves the total number of slides in first level in this presentation.
+	 */
+	function getTotalSlidesLevelOne() {
+
+		return dom.wrapper.querySelectorAll( HORIZONTAL_SLIDES_SELECTOR ).length;
 
 	}
 
@@ -6006,6 +6102,8 @@
 
 		// Returns the total number of slides
 		getTotalSlides: getTotalSlides,
+
+		getTotalSlidesLevelOne:getTotalSlidesLevelOne,
 
 		// Returns the slide element at the specified index
 		getSlide: getSlide,

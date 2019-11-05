@@ -4,11 +4,11 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-		<title>reveal.js</title>
+		<title>Kreveal.js</title>
 
 		<link rel="stylesheet" href="css/reset.css">
 		<link rel="stylesheet" href="css/reveal.css">
-		<link rel="stylesheet" href="css/theme/black.css">
+		<link rel="stylesheet" href="css/theme/kha_solarized.css" id="theme">
 
 		<!-- Theme used for syntax highlighting of code -->
 		<link rel="stylesheet" href="lib/css/monokai.css">
@@ -25,8 +25,51 @@
 	<body>
 		<div class="reveal">
 			<div class="slides">
-				<section>Slide 1</section>
-				<section>Slide 2</section>
+				<section>
+					<h1>Kreveal.js</h1>
+					<p>(forked from <a href="https://github.com/hakimel/reveal.js">reveal.js</a>)</p>
+					<footer>
+						$
+							%%%% If you see this, MathJax wasn't loaded ...
+							\definecolor{myred}{RGB}{231,76,60}
+							\definecolor{mydarkred}{RGB}{166,51,38}
+							\definecolor{mygreen}{RGB}{38,166,115}
+							\definecolor{myblue}{RGB}{23,110,179}
+							\definecolor{mylightblue}{RGB}{104,171,216}
+							\definecolor{myyellow}{RGB}{101,103,10}
+							\definecolor{mygrey}{RGB}{101,123,131}
+							\definecolor{mynormal}{RGB}{41,128,185}
+						$
+					</footer>
+				</section>
+				<section>
+					<h2>Maths!</h2>
+					<p>
+						$
+							\begin{equation}
+								\vx \in \R^3
+							\end{equation}
+						$
+						<br/>
+						\[
+							\begin{equation}
+								{\color{myblue}\vy} \in {\color{mydarkred}\R^2}
+							\end{equation}
+						\]
+					</p>
+				</section>
+				<section slide-title="My bookmark" slide-title-position="middle">
+					<h2>Bookmarks!</h2>
+				</section>
+				<section>
+					<h2>Blocks!</h2>
+					<blockquote class="example" cite="">
+						What a wonderful block!
+					</blockquote>
+					<blockquote class="theorem" cite="">
+						What a wonderful block!
+					</blockquote>
+				</section>
 			</div>
 		</div>
 
@@ -38,10 +81,28 @@
 			// - https://github.com/hakimel/reveal.js#dependencies
 			Reveal.initialize({
 				hash: true,
+
+				slideNumber: 'h.v/t',
+
+				transition: 'none', // none/fade/slide/convex/concave/zoom
+				transitionSpeed: 'fast',
+
+				math: {
+					TeX:{
+						extensions: ["color.js"],
+						Macros: {
+							R: '\\mathbb{R}',
+							vx: '\\mathbf{x}',
+							vy: '\\mathbf{y}'
+						}
+					}
+				},
+				
 				dependencies: [
 					{ src: 'plugin/markdown/marked.js' },
 					{ src: 'plugin/markdown/markdown.js' },
 					{ src: 'plugin/highlight/highlight.js' },
+					{ src: 'plugin/math/math.js', async: true },
 					{ src: 'plugin/notes/notes.js', async: true }
 				]
 			});
